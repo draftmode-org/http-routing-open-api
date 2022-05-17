@@ -36,21 +36,21 @@ paths:
           required: true
           name: "paymentFrom"
           schema:
-            $ref: "#/components/schemas/paymentDateFrom"
+            $ref: "#/components/schemas/PaymentDateFrom"
         - in: query
           name: "paymentState"
           schema:
-            $ref: "#/components/schemas/paymentState"
+            $ref: "#/components/schemas/PaymentState"
         - in: cookie
           required: false
           name: "user-name"
           schema:
-            $ref: "#/components/schemas/userName"
+            $ref: "#/components/schemas/UserName"
         - in: header
           required: false
           name: "user-name"
           schema:
-            $ref: "#/components/schemas/userName"
+            $ref: "#/components/schemas/UserName"
       tags:
         - Payments
       summary:
@@ -64,20 +64,20 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/paymentId'
+                  $ref: '#/components/schemas/PaymentId'
 
-  "/payments/{paymentId}":
+  "/payments/{PaymentId}":
     parameters:
       - in: path
         required: true
-        name: paymentId
+        name: PaymentId
         schema:
-          $ref: "#/components/schemas/paymentId"
+          $ref: "#/components/schemas/PaymentId"
       - in: query
         required: false
         name: "id"
         schema:
-          $ref: "#/components/schemas/paymentId"
+          $ref: "#/components/schemas/PaymentId"
     patch:
       tags:
         - Payment
@@ -100,11 +100,11 @@ paths:
         - in: query
           name: paymentFrom
           schema:
-            $ref: "#/components/schemas/paymentDateFrom"
+            $ref: "#/components/schemas/PaymentDateFrom"
       operationId: payment_getView
       responses:
         200:
-          $ref: '#/components/responses/paymentGetView'
+          $ref: '#/components/responses/PaymentGetView'
         400:
           description: 'returns a list of vehicles'
           content:
@@ -112,7 +112,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/paymentId'
+                  $ref: '#/components/schemas/PaymentId'
     post:
       tags:
         - Payment
@@ -124,7 +124,7 @@ paths:
       responses:
         200:
           $ref: "#/components/responses/200"
-  "/payment/{paymentId}/items":
+  "/payment/{PaymentId}/items":
     get:
       tags:
         - Payment
@@ -133,9 +133,21 @@ paths:
       operationId: payment_getItems
       parameters:
         - in: path
-          name: paymentId
+          name: PaymentId
           schema:
-            $ref: "#/components/schemas/paymentId"
+            $ref: "#/components/schemas/PaymentId"
+      responses:
+        200:
+          $ref: "#/components/responses/200"
+  "/type":
+    post:
+      operationId: post_type
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+              required: true
       responses:
         200:
           $ref: "#/components/responses/200"
@@ -154,18 +166,16 @@ components:
           schema:
             type: object
             required:
-              - paymentDate
+              - PaymentDate
             properties:
-              items:
-                type: array
-              paymentDate:
-                $ref: "#/components/schemas/paymentDate"
-              paymentState:
-                $ref: "#/components/schemas/paymentState"
-              customer:
-                $ref: "#/components/schemas/customer"
+              PaymentDate:
+                $ref: "#/components/schemas/PaymentDate"
+              PaymentState:
+                $ref: "#/components/schemas/PaymentState"
+              Customer:
+                $ref: "#/components/schemas/Customer"
   responses:
-    paymentGetView:
+    PaymentGetView:
       description: "payment entity"
       content:
         application/json:
@@ -173,7 +183,7 @@ components:
             type: object
             properties:
               id:
-                $ref: "#/components/schemas/paymentId"
+                $ref: "#/components/schemas/PaymentId"
     200:
       description: successful
     201:
@@ -181,26 +191,26 @@ components:
     400:
       description: invalid argument(s)
   schemas:
-    userName:
+    UserName:
       type: string
       minLength: 10
-    paymentDateFrom:
-      $ref: "#/components/schemas/paymentDate"
-    paymentDateTo:
-      $ref: "#/components/schemas/paymentDate"
-    paymentDate:
+    PaymentDateFrom:
+      $ref: "#/components/schemas/PaymentDate"
+    PaymentDateTo:
+      $ref: "#/components/schemas/PaymentDate"
+    PaymentDate:
       type: string
       format: date
-    paymentId:
+    PaymentId:
       type: string
       maxLength: 5
-    paymentState:
+    PaymentState:
       type: number
       enum:
         - 1
         - 2
         - 3
-    customer:
+    Customer:
       type: object
       properties:
         firstName:
@@ -229,3 +239,11 @@ components:
           type: string
         age:
           type: number
+    PaymentItem:
+      type: object
+      properties:
+        amount:
+          type: number
+          required: true
+        tax:
+          type: integer

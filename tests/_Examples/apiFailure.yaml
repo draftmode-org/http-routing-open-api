@@ -44,6 +44,7 @@ paths:
         200:
           description: created successful
     delete:
+      summary: "requestBody node schema in requestBody ref missing"
       tags:
         - Payments
       operationId: payment_delete
@@ -53,10 +54,8 @@ paths:
         200:
           description: created successful
   "/animals":
-    parameters:
-      - in: query
-        name: test
     patch:
+      summary: "in/query invalid schema ref"
       tags:
         - Animals
       parameters:
@@ -68,6 +67,19 @@ paths:
       responses:
         200:
           description: fine
+    put:
+      summary: "in/query invalid root schema ref"
+      tags:
+        - Animals
+      parameters:
+        - in: query
+          name: "invalidRef"
+          schema:
+            $ref: "InvalidRootNode"
+      operationId: animals_put
+      responses:
+        200:
+          description: fine
     get:
       tags:
         - Animals
@@ -75,7 +87,17 @@ paths:
       responses:
         200:
           description: fine
-
+    delete:
+      summary: "in/query node schema missing"
+      tags:
+        - Animals
+      operationId: animals_delete
+      parameters:
+        - in: query
+          name: id
+      responses:
+        200:
+          description: fine
 components:
   requestBodies:
     NodeSchemaMissing:

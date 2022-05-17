@@ -1,12 +1,12 @@
 <?php
-namespace Terrazza\Component\HttpRouting\OpenApi\Tests;
+namespace Terrazza\Component\HttpRouting\OpenApi\Tests\Router;
 use PHPUnit\Framework\TestCase;
 use Terrazza\Component\Http\Message\Uri\Uri;
 use Terrazza\Component\Http\Request\HttpServerRequest;
 use Terrazza\Component\HttpRouting\OpenApi\OpenApiRouter;
 use Terrazza\Dev\Logger\Logger;
 
-class OpenApiRouterXest extends TestCase {
+class OpenApiRouterTest extends TestCase {
     CONST routingFileName   = "tests/_Examples/api.yaml";
     CONST baseUri           = "https://test.terrazza.io";
 

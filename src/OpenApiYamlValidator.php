@@ -10,7 +10,7 @@ class OpenApiYamlValidator implements OpenApiYamlValidatorInterface {
     private LoggerInterface $logger;
 
     public function __construct(LoggerInterface $logger) {
-        $this->validator                            = new ObjectValueValidator();
+        $this->validator                            = new ObjectValueValidator($logger);
         $this->logger                               = $logger;
     }
 

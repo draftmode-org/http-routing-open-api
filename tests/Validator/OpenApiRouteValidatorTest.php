@@ -1,24 +1,28 @@
 <?php
-namespace Terrazza\Component\HttpRouting\OpenApi\Tests;
+namespace Terrazza\Component\HttpRouting\OpenApi\Tests\Validator;
 use DateTime;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Terrazza\Component\Http\Message\Uri\Uri;
 use Terrazza\Component\Http\Request\HttpServerRequest;
 use Terrazza\Component\HttpRouting\HttpRoute;
+use Terrazza\Component\HttpRouting\HttpRoutingValidatorInterface;
 use Terrazza\Component\HttpRouting\OpenApi\OpenApiRouteValidator;
 use Terrazza\Dev\Logger\Logger;
 
-class OpenApiRouteValidatorXest extends TestCase {
+class OpenApiRouteValidatorTest extends TestCase {
     CONST routingFileName   = "tests/_Examples/api.yaml";
     CONST baseUri           = "https://test.terrazza.io";
 
+    private function getValidator(string $yamlFile, $logType=null) : HttpRoutingValidatorInterface {
+        $logger             = (new Logger("OpenApiRouteValidator"))->createLogger($logType);
+        return new OpenApiRouteValidator($yamlFile, $logger);
+    }
     /*
      * GET PAYMENT tests
      */
     function testGetPaymentSuccessful() {
-        $logger             = (new Logger("OpenApiRouter"))->createLogger(false);
-        $validator          = new OpenApiRouteValidator(self::routingFileName, $logger);
+        $validator          = $this->getValidator(self::routingFileName, false);
         $path               = "/payments/12345";
         $serverRequest      = new HttpServerRequest("GET", new Uri(self::baseUri.$path));
         $httpRoute          = new HttpRoute("/payments/{paymentId}", "get", "requestHandlerClass");
@@ -27,11 +31,10 @@ class OpenApiRouteValidatorXest extends TestCase {
     }
 
     function testGetPaymentFailurePathParam() {
-        $logger             = (new Logger("OpenApiRouter"))->createLogger(false);
-        $validator          = new OpenApiRouteValidator(self::routingFileName, $logger);
+        $validator          = $this->getValidator(self::routingFileName, false);
         $path               = "/payments/1234509";
         $serverRequest      = new HttpServerRequest("GET", new Uri(self::baseUri.$path));
-        $httpRoute          = new HttpRoute("/payments/{paymentId}", "get", "requestHandlerClass");
+        $httpRoute          = new HttpRoute("/payments/{PaymentId}", "get", "requestHandlerClass");
         $this->expectException(InvalidArgumentException::class);
         $validator->validate($httpRoute, $serverRequest);
     }
@@ -40,8 +43,7 @@ class OpenApiRouteValidatorXest extends TestCase {
      * GET PAYMENTS tests
      */
     function testGetPaymentsSuccessful() {
-        $logger             = (new Logger("OpenApiRouter"))->createLogger(false);
-        $validator          = new OpenApiRouteValidator(self::routingFileName, $logger);
+        $validator          = $this->getValidator(self::routingFileName, false);
         $path               = "/payments";
         $serverRequest      = (new HttpServerRequest("GET", new Uri(self::baseUri.$path)))
             ->withQueryParams(["paymentFrom" => (new DateTime)->format("Y-m-d")]);
@@ -51,8 +53,7 @@ class OpenApiRouteValidatorXest extends TestCase {
     }
 
     function testGetPaymentsSuccessfulEnum() {
-        $logger             = (new Logger("OpenApiRouter"))->createLogger(false);
-        $validator          = new OpenApiRouteValidator(self::routingFileName, $logger);
+        $validator          = $this->getValidator(self::routingFileName, false);
         $path               = "/payments";
         $serverRequest      = (new HttpServerRequest("GET", new Uri(self::baseUri.$path)))
             ->withQueryParams([
@@ -65,8 +66,7 @@ class OpenApiRouteValidatorXest extends TestCase {
     }
 
     function testGetPaymentsFailureEnum() {
-        $logger             = (new Logger("OpenApiRouter"))->createLogger(false);
-        $validator          = new OpenApiRouteValidator(self::routingFileName, $logger);
+        $validator          = $this->getValidator(self::routingFileName, false);
         $path               = "/payments";
         $serverRequest      = (new HttpServerRequest("GET", new Uri(self::baseUri.$path)))
             ->withQueryParams([
@@ -79,8 +79,7 @@ class OpenApiRouteValidatorXest extends TestCase {
     }
 
     function testGetPaymentsFailureQueryParamMissing() {
-        $logger             = (new Logger("OpenApiRouter"))->createLogger(false);
-        $validator          = new OpenApiRouteValidator(self::routingFileName, $logger);
+        $validator          = $this->getValidator(self::routingFileName, false);
         $path               = "/payments";
         $serverRequest      = new HttpServerRequest("GET", new Uri(self::baseUri.$path));
         // queryParam paymentFrom required, missing
@@ -93,19 +92,17 @@ class OpenApiRouteValidatorXest extends TestCase {
      * POST PAYMENT tests
      */
     function testPostSuccessful() {
-        $logger             = (new Logger("OpenApiRouter"))->createLogger(false);
-        $validator          = new OpenApiRouteValidator(self::routingFileName, $logger);
+        $validator          = $this->getValidator(self::routingFileName, false);
         $path               = "/payments";
         $serverRequest      = (new HttpServerRequest("POST", new Uri(self::baseUri.$path)))
-            ->withBody(json_encode(["paymentDate" => "2022-01-01"]));
+            ->withBody(json_encode(["PaymentDate" => "2022-01-01"]));
         $httpRoute          = new HttpRoute("/payments", "post", "requestHandlerClass");
         $validator->validate($httpRoute, $serverRequest);
         $this->assertTrue(true);
     }
 
     function testPostSuccessfulOneOf() {
-        $logger             = (new Logger("OpenApiRouter"))->createLogger(false);
-        $validator          = new OpenApiRouteValidator(self::routingFileName, $logger);
+        $validator          = $this->getValidator(self::routingFileName, false);
         $path               = "/animals";
         $serverRequest      = (new HttpServerRequest("POST", new Uri(self::baseUri.$path)))
             ->withBody(json_encode(["dogName" => "myName"]));
