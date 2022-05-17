@@ -1,0 +1,4 @@
+/plugin/
+/tests/.report/
+/.idea/
+/.phpunit.result.cache

@@ -1,0 +1,131 @@
+openapi: 3.0.3
+info:
+  title: Title
+  description: Title
+  version: 1.0.0
+servers:
+  - url: '/api/'
+tags:
+  - name: Payment
+paths:
+  "/payments":
+    get:
+      tags:
+        - Payments
+      operationId: payment_get
+      responses:
+        200:
+          description: created successful
+    post:
+      tags:
+        - Payments
+      operationId: payment_post
+      requestBody:
+        $ref: "#/components/requestBodies/PaymentPost"
+      responses:
+          200:
+            description: created successful
+    patch:
+      tags:
+        - Payments
+      operationId: payment_post
+      requestBody:
+        $ref: "#/components/requestBodies/EmptyContent"
+      responses:
+        200:
+          description: created successful
+    put:
+      tags:
+        - Payments
+      operationId: payment_put
+      requestBody:
+        $ref: "#/components/requestBodies/NodeContendMissing"
+      responses:
+        200:
+          description: created successful
+    delete:
+      tags:
+        - Payments
+      operationId: payment_delete
+      requestBody:
+        $ref: "#/components/requestBodies/NodeSchemaMissing"
+      responses:
+        200:
+          description: created successful
+  "/animals":
+    parameters:
+      - in: query
+        name: test
+    patch:
+      tags:
+        - Animals
+      parameters:
+        - in: query
+          name: "invalidRef"
+          schema:
+            $ref: "#/components/requestBodies/InvalidRef"
+      operationId: animals_put
+      responses:
+        200:
+          description: fine
+    get:
+      tags:
+        - Animals
+      operationId: animals_get
+      responses:
+        200:
+          description: fine
+
+components:
+  requestBodies:
+    NodeSchemaMissing:
+      content:
+        application/json:
+    NodeContendMissing:
+      description: "Missing"
+    EmptyContent:
+    PaymentPost:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - paymentDate
+            properties:
+              paymentDate:
+                $ref: "#/components/schemas/paymentDate"
+              paymentState:
+                $ref: "#/components/schemas/paymentState"
+              customer:
+                $ref: "#/components/schemas/customer"
+  schemas:
+    userName:
+      type: string
+      minLength: 10
+    paymentDateFrom:
+      $ref: "#/components/schemas/paymentDate"
+    paymentDateTo:
+      $ref: "#/components/schemas/paymentDate"
+    paymentDate:
+      type: string
+      format: date
+    paymentId:
+      type: string
+      maxLength: 5
+    paymentState:
+      type: number
+      enum:
+        - 1
+        - 2
+        - 3
+    customer:
+      type: object
+      properties:
+        firstName:
+          $ref: "#/components/schemas/firstName"
+    firstName:
+      type: string
+      maxLength: 10
+    date:
+      type: string
+      format: date

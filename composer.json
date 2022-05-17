@@ -1,0 +1,48 @@
+{
+    "name": "terrazza/http-routing-open-api",
+    "type" : "library",
+    "version": "1.0.0",
+    "description": "Terrazza Component Http-Routing for OpenApi 3.0",
+    "license": "MIT",
+    "config" : {
+        "vendor-dir" : "plugin"
+    },
+    "authors": [
+        {
+            "name": "Peter Fux",
+            "email": "it@noframework.io"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "terrazza/validator": "1.*",
+        "terrazza/routing": "dev-main",
+        "terrazza/http-routing": "1.*",
+        "psr/log": "1.1.*",
+        "ext-json": "*",
+        "ext-libxml": "*"
+    },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/terrazza/dev-logger.git"
+        }
+    ],
+    "require-dev" : {
+        "terrazza/dev-logger": "dev-main",
+        "phpunit/phpunit": "^9.3",
+        "vimeo/psalm": "4.x-dev"
+    },
+    "autoload": {
+        "psr-4": {
+            "Terrazza\\Component\\HttpRouting\\OpenApi\\" : "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Terrazza\\Component\\HttpRouting\\OpenApi\\Tests\\_Examples\\" : "tests\\_Examples",
+            "Terrazza\\Component\\HttpRouting\\OpenApi\\Tests\\_Mocks\\" : "tests\\_Mocks"
+        }
+    },
+    "minimum-stability": "dev"
+}
