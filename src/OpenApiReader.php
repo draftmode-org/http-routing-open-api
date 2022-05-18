@@ -49,11 +49,17 @@ class OpenApiReader implements OpenApiReaderInterface {
         $paths                                      = [];
         foreach ($yaml["paths"] ?? [] as $uri => $methods) {
             foreach ($methods as $method => $properties) {
+                if (!is_array($properties)) {
+                    throw new RuntimeException("paths/$uri/$method expect array, given ".gettype($properties));
+                }
                 if (in_array($method, $skipMethods)) {
                     continue;
                 }
                 if (!array_key_exists($uri, $paths)) {
                     $paths[$uri]                    = [];
+                }
+                if (!array_key_exists("operationId", $properties)) {
+                    throw new RuntimeException("property operationId in paths$uri/$method missing");
                 }
                 $paths[$uri][$method]               = $properties["operationId"];
             }
@@ -181,6 +187,9 @@ class OpenApiReader implements OpenApiReaderInterface {
                 $uriParameter                       = [];
                 $routeParameter                     = [];
                 foreach ($methods as $method => $parameters) {
+                    if (!is_array($parameters)) {
+                        continue;
+                    };
                     if ($method === "parameters") {
                         $this->logger->debug("method $method for uri $routePath found");
                         $uriParameter               = $parameters;
@@ -196,7 +205,7 @@ class OpenApiReader implements OpenApiReaderInterface {
                     }
                 }
                 if ($methodParametersFound) {
-                    $pathParameters                 = $this->mergePathParameters($uriParameter, $routeParameter);
+                    $pathParameters                 = $this->splitPathParameters($uriParameter, $routeParameter);
                 }
                 $this->pathParameters[$pathKey]     = $pathParameters;
                 return $pathParameters;
@@ -210,11 +219,14 @@ class OpenApiReader implements OpenApiReaderInterface {
      * @param array $methodParameter
      * @return array
      */
-    private function mergePathParameters(array $uriParameter, array $methodParameter) : array {
+    private function splitPathParameters(array $uriParameter, array $methodParameter) : array {
         $this->logger->debug("merge parameters", ["uriParams" => $uriParameter, "methodParams" => $methodParameter]);
         $parameters                                 = array_filter(array_merge($uriParameter, $methodParameter));
         $response                                   = [];
         foreach ($parameters as $parameter) {
+            if (!is_array($parameter)) {
+                throw new RuntimeException("parameters items has to be an array, give ".gettype($parameter));
+            }
             $type                                   = $parameter["in"] ?? "-";
             if (!array_key_exists($type, $response)) {
                 $response[$type]                    = [];
@@ -224,11 +236,11 @@ class OpenApiReader implements OpenApiReaderInterface {
             if (!array_key_exists($schemaNode, $parameter)) {
                 throw new RuntimeException("node $schemaNode in parameters/$type for $name does not exist");
             }
-            $parameterSchema                        = $parameter[$schemaNode];
-            if (array_key_exists("required", $parameter)) {
-                $parameterSchema["required"]        = $parameter["required"];
+            $schema                                 = $parameter[$schemaNode];
+            if (!is_array($schema)) {
+                throw new RuntimeException("node parameters/$type/$name/schema expected array, given ".gettype($schema));
             }
-            $response[$type][$name]                 = $parameterSchema;
+            $response[$type][$name]                 = $schema;
         }
         return $response;
     }
@@ -304,17 +316,18 @@ class OpenApiReader implements OpenApiReaderInterface {
         $nodes                                  = [];
         foreach ($refs as $refKey) {
             $nodes[]                            = $refKey;
+            $this->logger->debug("search ref $refKey: found ".join("/", $nodes));
             if (array_key_exists($refKey, $content)) {
                 $content                        = $content[$refKey];
             } else {
-                throw new RuntimeException("node ".join("/", $nodes). " does not exist");
+                throw new RuntimeException("ref ".join("/", $nodes). " does not exist");
             }
         }
         if (count($nodes) === 0) {
-            throw new RuntimeException("node $ref does not exist");
+            throw new RuntimeException("ref $ref does not exist");
         }
-        if (is_null($content)) {
-            throw new RuntimeException("node ".join("/", $nodes). " exists, but does not have any content");
+        if (!is_array($content)) {
+            throw new RuntimeException("ref ".join("/", $nodes). " exists, but content has to be an array");
         }
         return $content;
     }

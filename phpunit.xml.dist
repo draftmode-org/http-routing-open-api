@@ -24,6 +24,10 @@
     <ini name="error_reporting" value="-1"/>
   </php>
   <testsuites>
+    <testsuite name="single">
+      <file>./tests/Reader/OpenApiReaderTest.php</file>
+      <file>./tests/Reader/OpenApiReaderRouteTest.php</file>
+    </testsuite>
     <testsuite name="all">
       <directory>./tests</directory>
     </testsuite>
