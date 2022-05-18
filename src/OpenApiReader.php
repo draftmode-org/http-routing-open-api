@@ -263,24 +263,44 @@ class OpenApiReader implements OpenApiReaderInterface {
      * @return array
      */
     private function getEncodedProperty(string $propertyName, array $property, ?string $parentPropertyName=null) : array {
-        $this->logger->debug("getEncodedProperty for $propertyName");
+        $this->logger->debug("getEncodedProperty for $propertyName", $property);
         $propertyRequired                           = $property["required"] ?? null;
         while (array_key_exists("\$ref", $property)) {
             $propertyRef                            = $property["\$ref"];
             $this->logger->debug("...getContentByRef for $propertyRef");
             $property                               = $this->getContentByRef($propertyRef);
-        }
-        foreach (self::multipleTypes as $multipleType) {
-            if (array_key_exists($multipleType, $property)) {
-                $property["type"]                   = $multipleType;
-                $property["properties"]             = $property[$multipleType];
+            if (array_key_exists("required", $property)) {
+                $propertyRequired                   = $property["required"];
             }
         }
         $fullPropertyName                           = $parentPropertyName ? $parentPropertyName . "." . $propertyName : $propertyName;
+        foreach (self::multipleTypes as $multipleType) {
+            if (array_key_exists($multipleType, $property)) {
+                $this->logger->debug("multipleType $multipleType found in property", $property);
+                $property["type"]                   = $multipleType;
+                if (!is_array($property[$multipleType])) {
+                    throw new RuntimeException("node $fullPropertyName/$multipleType expected array, given ".gettype($property[$multipleType]));
+                }
+                $property["properties"]             = [];
+                foreach ($property[$multipleType] as $iChildProperty => $childProperty) {
+                    if (!is_array($childProperty)) {
+                        throw new RuntimeException("node $fullPropertyName/$multipleType.$iChildProperty expected array, given ".gettype($childProperty));
+                    }
+                    $property["properties"][]       = $childProperty;
+                }
+            }
+        }
         if (array_key_exists("type", $property)) {
             if (array_key_exists("properties", $property)) {
                 $childSchemas                       = [];
+                $propertyProperties                 = $property["properties"];
+                if (!is_array($propertyProperties)) {
+                    throw new RuntimeException("node $fullPropertyName/properties expected array, given ".gettype($propertyProperties));
+                }
                 foreach ($property["properties"] as $childName => $childProperties) {
+                    if (!is_array($childProperties)) {
+                        throw new RuntimeException("nodes for $fullPropertyName/properties expected array, given ".gettype($childProperties));
+                    }
                     $childSchema                    = $this->getEncodedProperty(
                         $childName, $childProperties, $fullPropertyName);
                     if (is_array($propertyRequired) &&

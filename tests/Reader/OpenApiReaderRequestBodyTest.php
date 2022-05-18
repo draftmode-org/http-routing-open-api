@@ -3,12 +3,12 @@ namespace Terrazza\Component\HttpRouting\OpenApi\Tests\Reader;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use Terrazza\Component\HttpRouting\OpenApi\Tests\_Mocks\OpenApiReader;
+use Terrazza\Component\HttpRouting\OpenApi\Tests\_Mocks\Helper;
 
 class OpenApiReaderRequestBodyTest extends TestCase {
 
     function testGetRequestBodyContents() {
-        $reader             = OpenApiReader::getReader(OpenApiReader::yamlFileName, false);
+        $reader             = Helper::getOpenApiReader(Helper::yamlFileName);
         $this->assertEquals([
             true,
             false, // method has no requestBody not found
@@ -21,7 +21,7 @@ class OpenApiReaderRequestBodyTest extends TestCase {
     }
 
     function testRequestBodyContent() {
-        $reader             = OpenApiReader::getReader(OpenApiReader::yamlFileName);
+        $reader             = Helper::getOpenApiReader(Helper::yamlFileName);
         $contents           = $reader->getRequestBodyContents("/payments", "post");
         $content            = $reader->getRequestBodyParams($contents, "application/json");
         $this->assertEquals([
@@ -50,43 +50,43 @@ class OpenApiReaderRequestBodyTest extends TestCase {
     }
 
     function testGetRequestBodyParamsOneOf() {
-        $reader             = OpenApiReader::getReader(OpenApiReader::yamlFileName);
+        $reader             = Helper::getOpenApiReader(Helper::yamlFileName);
         $contents           = $reader->getRequestBodyContents("/animals", "post");
         $this->assertIsArray($reader->getRequestBodyParams($contents, "application/json"));
     }
 
     function testFailureGetRequestBodyContentsRouteNotFound() {
-        $reader             = OpenApiReader::getReader(OpenApiReader::yamlFileName);
+        $reader             = Helper::getOpenApiReader(Helper::yamlFileName);
         $this->expectException(RuntimeException::class);
         $reader->getRequestBodyContents("/payments", "change");
     }
 
     function testFailureGetRequestBodyContentsContentMissing() {
-        $reader             = OpenApiReader::getReader(OpenApiReader::yamlFailureFileName);
+        $reader             = Helper::getOpenApiReader(Helper::yamlFailureFileName);
         $this->expectException(RuntimeException::class);
         $reader->getRequestBodyContents("/payments", "put");
     }
 
     function testFailureGetRequestBodyParamsContentType() {
-        $reader             = OpenApiReader::getReader(OpenApiReader::yamlFailureFileName);
+        $reader             = Helper::getOpenApiReader(Helper::yamlFailureFileName);
         $this->expectException(InvalidArgumentException::class);
         $reader->getRequestBodyParams([], "application/json");
     }
 
     function testFailureGetRequestBodyParamsNodeSchemaMissing() {
-        $reader             = OpenApiReader::getReader(OpenApiReader::yamlFailureFileName);
+        $reader             = Helper::getOpenApiReader(Helper::yamlFailureFileName);
         $this->expectException(RuntimeException::class);
         $reader->getRequestBodyParams(["application/json" => []], "application/json");
     }
 
     function testFailureGetRequestBodyParamsNodeTypeMissing() {
-        $reader             = OpenApiReader::getReader(OpenApiReader::yamlFailureFileName);
+        $reader             = Helper::getOpenApiReader(Helper::yamlFailureFileName);
         $this->expectException(RuntimeException::class);
         $reader->getRequestBodyParams(["application/json" => ["schema" => []]], "application/json");
     }
 
     function testFailureGetRequestBodyContentsEmptyNode() {
-        $reader             = OpenApiReader::getReader(OpenApiReader::yamlFailureFileName);
+        $reader             = Helper::getOpenApiReader(Helper::yamlFailureFileName);
         $this->expectException(RuntimeException::class);
         $reader->getRequestBodyContents("/payments", "patch");
     }
