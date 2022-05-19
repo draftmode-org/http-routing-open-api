@@ -7,6 +7,7 @@ use Terrazza\Component\Http\Message\Uri\Uri;
 use Terrazza\Component\Http\Request\HttpServerRequest;
 use Terrazza\Component\HttpRouting\HttpRoute;
 use Terrazza\Component\HttpRouting\HttpRoutingValidatorInterface;
+use Terrazza\Component\HttpRouting\OpenApi\OpenApiReader;
 use Terrazza\Component\HttpRouting\OpenApi\OpenApiRouteValidator;
 use Terrazza\Dev\Logger\Logger;
 
@@ -16,7 +17,8 @@ class OpenApiRouteValidatorTest extends TestCase {
 
     private function getValidator(string $yamlFile, $logType=null) : HttpRoutingValidatorInterface {
         $logger             = (new Logger("OpenApiRouteValidator"))->createLogger($logType);
-        return new OpenApiRouteValidator($yamlFile, $logger);
+        $reader             = new OpenApiReader($logger, $yamlFile);
+        return new OpenApiRouteValidator($logger, $reader);
     }
     /*
      * GET PAYMENT tests
@@ -112,8 +114,7 @@ class OpenApiRouteValidatorTest extends TestCase {
     }
 
     function xtestPostFailureNoOneOfMatches() {
-        $logger             = (new Logger("OpenApiRouter"))->createLogger(true);
-        $validator          = new OpenApiRouteValidator(self::routingFileName, $logger);
+        $validator          = $this->getValidator(self::routingFileName);
         $path               = "/animals";
         $serverRequest      = (new HttpServerRequest("POST", new Uri(self::baseUri.$path)))
             ->withBody(json_encode(["name" => "myName"]));
@@ -122,8 +123,7 @@ class OpenApiRouteValidatorTest extends TestCase {
     }
 
     function testPostFailureNoContent() {
-        $logger             = (new Logger("OpenApiRouter"))->createLogger(false);
-        $validator          = new OpenApiRouteValidator(self::routingFileName, $logger);
+        $validator          = $this->getValidator(self::routingFileName);
         $path               = "/payments";
         $serverRequest      = (new HttpServerRequest("post", new Uri(self::baseUri.$path)));
         $httpRoute          = new HttpRoute("/payments", "post", "requestHandlerClass");
@@ -132,8 +132,7 @@ class OpenApiRouteValidatorTest extends TestCase {
     }
 
     function testPostFailureContentInvalid() {
-        $logger             = (new Logger("OpenApiRouter"))->createLogger(false);
-        $validator          = new OpenApiRouteValidator(self::routingFileName, $logger);
+        $validator          = $this->getValidator(self::routingFileName);
         $path               = "/payments";
         $serverRequest      = (new HttpServerRequest("POST", new Uri(self::baseUri.$path)))
             ->withBody("plain text");
@@ -143,8 +142,7 @@ class OpenApiRouteValidatorTest extends TestCase {
     }
 
     function testPostFailureContentPropertyInvalid() {
-        $logger             = (new Logger("OpenApiRouter"))->createLogger(false);
-        $validator          = new OpenApiRouteValidator(self::routingFileName, $logger);
+        $validator          = $this->getValidator(self::routingFileName);
         $path               = "/payments";
         $serverRequest      = (new HttpServerRequest("POST", new Uri(self::baseUri.$path)))
             ->withBody(json_encode(["paymentDate" => "2022-31-01"]));

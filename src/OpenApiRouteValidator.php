@@ -8,14 +8,20 @@ use Terrazza\Component\HttpRouting\HttpRoute;
 use Terrazza\Component\HttpRouting\HttpRoutingValidatorInterface;
 
 class OpenApiRouteValidator implements HttpRoutingValidatorInterface {
-    private string $routingFileName;
+    private OpenApiReaderInterface $reader;
     private LoggerInterface $logger;
     private string $defaultContentType;
 
-    public function __construct(string $routingFileName, LoggerInterface $logger, ?string $defaultContentType=null) {
-        $this->routingFileName                      = $routingFileName;
+    public function __construct(LoggerInterface $logger, OpenApiReaderInterface $openApiReader, ?string $defaultContentType=null) {
+        $this->reader                               = $openApiReader;
         $this->logger                               = $logger;
         $this->defaultContentType                   = $defaultContentType ?? "application/json";
+    }
+
+    public function load(string $yamlFileName) {
+        $reader                                     = clone $this;
+        $reader->reader                             = $this->reader->load($yamlFileName);
+        return $reader;
     }
 
     /**
@@ -24,22 +30,20 @@ class OpenApiRouteValidator implements HttpRoutingValidatorInterface {
      */
     public function validate(HttpRoute $route, HttpServerRequestInterface $request) : void {
         //
-        $reader                                     = new OpenApiReader($this->logger);
         $validator                                  = new OpenApiYamlValidator($this->logger);
         //
-        $yaml                                       = $reader->load($this->routingFileName);
         $uri                                        = $route->getRoutePath();
         $method                                     = $route->getRouteMethod();
         //
         // validate pathParam
         //
-        if ($params = $yaml->getParameterParams($uri, $method, "path")) {
+        if ($params = $this->reader->getParameterParams($uri, $method, "path")) {
             $validator->validate("pathParam", $request->getPathParams($uri), $params);
         }
         //
         // validate queryParam
         //
-        if ($params = $yaml->getParameterParams($uri, $method, "query")) {
+        if ($params = $this->reader->getParameterParams($uri, $method, "query")) {
             $validator->validate("queryParam", $request->getQueryParams(), $params);
         }
         /*
@@ -59,12 +63,12 @@ class OpenApiRouteValidator implements HttpRoutingValidatorInterface {
         //
         // validate requestBody
         //
-        if ($requestBodyParams = $yaml->getRequestBodyContents($uri, $method)) {
+        if ($requestBodyParams = $this->reader->getRequestBodyContents($uri, $method)) {
             $requestContentType                     = $request->getHeaderLine("Content-Type");
             if (strlen($requestContentType) === 0) {
                 $requestContentType                 = $this->defaultContentType;
             }
-            $requestBodyParams                      = $yaml->getRequestBodyParams($requestBodyParams, $requestContentType);
+            $requestBodyParams                      = $this->reader->getRequestBodyParams($requestBodyParams, $requestContentType);
             $requestBody                            = $this->getRequestBodyEncoded($requestContentType, $request->getBody()->getContents());
             $validator->validate("requestBody", $requestBody, $requestBodyParams);
         }

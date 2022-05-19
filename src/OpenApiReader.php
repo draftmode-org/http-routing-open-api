@@ -12,8 +12,11 @@ class OpenApiReader implements OpenApiReaderInterface {
     private array $pathParameters                   = [];
     CONST multipleTypes = ["oneOf"];
 
-    public function __construct(LoggerInterface $logger) {
+    public function __construct(LoggerInterface $logger, ?string $yamlFileName=null) {
         $this->logger                               = $logger;
+        if ($yamlFileName) {
+            $this->load($yamlFileName);
+        }
     }
 
     /**

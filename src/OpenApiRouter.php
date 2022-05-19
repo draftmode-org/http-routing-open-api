@@ -11,14 +11,12 @@ use Terrazza\Component\Routing\RouteSearch;
 
 class OpenApiRouter implements HttpRoutingInterface {
     private LoggerInterface $logger;
-    private string $routingFileName;
     private OpenApiReaderInterface $reader;
     private IRouteMatcher $routeMatcher;
 
-    public function __construct(string $routingFileName, LoggerInterface $logger) {
+    public function __construct(OpenApiReaderInterface $reader, LoggerInterface $logger) {
         $this->logger                               = $logger;
-        $this->routingFileName                      = $routingFileName;
-        $this->reader                               = new OpenApiReader($logger);
+        $this->reader                               = $reader;
         $this->routeMatcher                         = new RouteMatcher($logger);
     }
 
@@ -28,15 +26,14 @@ class OpenApiRouter implements HttpRoutingInterface {
      */
     public function getRoute(HttpServerRequestInterface $request) :?HttpRoute {
         $this->logger->debug("getRoute");
-        //
-        $yaml                                       = $this->reader->load($this->routingFileName);
-        //
+
         $routeSearch                                = new RouteSearch(
             $request->getUri()->getPath(),
             $request->getMethod(),
         );
+
         $skipMethods                                = ["parameters", "summary", "head"];
-        foreach ($yaml->getRoutes() as $uri => $methods) {
+        foreach ($this->reader->getRoutes() as $uri => $methods) {
             foreach ($methods as $method => $operationId) {
                 if (in_array($method, $skipMethods)) continue;
                 $this->logger->debug("...search for $uri / $method");

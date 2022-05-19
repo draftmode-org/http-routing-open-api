@@ -3,6 +3,7 @@ namespace Terrazza\Component\HttpRouting\OpenApi\Tests\Router;
 use PHPUnit\Framework\TestCase;
 use Terrazza\Component\Http\Message\Uri\Uri;
 use Terrazza\Component\Http\Request\HttpServerRequest;
+use Terrazza\Component\HttpRouting\OpenApi\OpenApiReader;
 use Terrazza\Component\HttpRouting\OpenApi\OpenApiRouter;
 use Terrazza\Dev\Logger\Logger;
 
@@ -12,7 +13,8 @@ class OpenApiRouterTest extends TestCase {
 
     function testFindRouteWithOutValidation() {
         $logger             = (new Logger("OpenApiRouter"))->createLogger(false);
-        $router             = new OpenApiRouter(self::routingFileName, $logger);
+        $reader             = new OpenApiReader($logger, self::routingFileName);
+        $router             = new OpenApiRouter($reader, $logger);
         $serverRequest      = new HttpServerRequest("GET", new Uri(self::baseUri."/payments/12345"));
         $this->assertEquals([
             false,
