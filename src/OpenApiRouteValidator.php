@@ -5,23 +5,35 @@ use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Terrazza\Component\Http\Request\HttpServerRequestInterface;
 use Terrazza\Component\HttpRouting\HttpRoute;
+use Terrazza\Component\HttpRouting\HttpRoutingReaderInterface;
 use Terrazza\Component\HttpRouting\HttpRoutingValidatorInterface;
 
 class OpenApiRouteValidator implements HttpRoutingValidatorInterface {
-    private OpenApiReaderInterface $reader;
+    private HttpRoutingReaderInterface $reader;
     private LoggerInterface $logger;
     private string $defaultContentType;
 
-    public function __construct(LoggerInterface $logger, OpenApiReaderInterface $openApiReader, ?string $defaultContentType=null) {
-        $this->reader                               = $openApiReader;
+    public function __construct(LoggerInterface $logger, HttpRoutingReaderInterface $reader, ?string $defaultContentType=null) {
+        $this->reader                               = $reader;
         $this->logger                               = $logger;
         $this->defaultContentType                   = $defaultContentType ?? "application/json";
     }
 
-    public function load(string $yamlFileName) {
-        $reader                                     = clone $this;
-        $reader->reader                             = $this->reader->load($yamlFileName);
-        return $reader;
+    /**
+     * @return HttpRoutingReaderInterface
+     */
+    public function getReader() : HttpRoutingReaderInterface {
+        return $this->reader;
+    }
+
+    /**
+     * @param HttpRoutingReaderInterface $reader
+     * @return HttpRoutingValidatorInterface
+     */
+    public function setReader(HttpRoutingReaderInterface $reader) : HttpRoutingValidatorInterface {
+        $validator                                  = clone $this;
+        $validator->reader                          = $reader;
+        return $validator;
     }
 
     /**
@@ -76,11 +88,11 @@ class OpenApiRouteValidator implements HttpRoutingValidatorInterface {
 
     /**
      * @param string $contentType
-     * @param $content
+     * @param string|null $content
      * @return mixed|null
      */
-    private function getRequestBodyEncoded(string $contentType, $content) {
-        if (strlen($content)) {
+    private function getRequestBodyEncoded(string $contentType, ?string $content=null) {
+        if (!is_null($content) && strlen($content)) {
             if (preg_match("#(application/json)|(application/vnd.+\+json)#", $contentType, $matches)) {
                 $contentEncoded                     = json_decode($content);
                 if (json_last_error() === JSON_ERROR_NONE) {

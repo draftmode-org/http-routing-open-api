@@ -9,6 +9,7 @@ use Terrazza\Component\HttpRouting\HttpRoute;
 use Terrazza\Component\HttpRouting\HttpRoutingValidatorInterface;
 use Terrazza\Component\HttpRouting\OpenApi\OpenApiReader;
 use Terrazza\Component\HttpRouting\OpenApi\OpenApiRouteValidator;
+use Terrazza\Component\HttpRouting\OpenApi\Tests\_Mocks\Helper;
 use Terrazza\Dev\Logger\Logger;
 
 class OpenApiRouteValidatorTest extends TestCase {
@@ -20,6 +21,18 @@ class OpenApiRouteValidatorTest extends TestCase {
         $reader             = new OpenApiReader($logger, $yamlFile);
         return new OpenApiRouteValidator($logger, $reader);
     }
+
+    function testSwitchYamlFile() {
+        // next validator will failure, paymentFrom missing
+        $validator          = $this->getValidator(Helper::yamlFileName, true);
+
+        // next validator will get a new yamlFile, validation successfully
+        $validator          = $validator->setReader($validator->getReader()->load(Helper::yamlFailureFileName));
+        $routes             = $validator->getReader()->getRoutes();
+        $uri                = "/animals";
+        $this->assertTrue(array_key_exists($uri, $routes) && array_key_exists("put", $routes[$uri]));
+    }
+
     /*
      * GET PAYMENT tests
      */

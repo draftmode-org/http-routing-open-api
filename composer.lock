@@ -329,16 +329,16 @@
         },
         {
             "name": "terrazza/http-routing",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/terrazza/http-routing.git",
-                "reference": "00e6fb306f3de4c42b7755b53134be6abed0aa13"
+                "reference": "257a9b7b47677ffbaee3578d05035ec8ca06f514"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/terrazza/http-routing/zipball/00e6fb306f3de4c42b7755b53134be6abed0aa13",
-                "reference": "00e6fb306f3de4c42b7755b53134be6abed0aa13",
+                "url": "https://api.github.com/repos/terrazza/http-routing/zipball/257a9b7b47677ffbaee3578d05035ec8ca06f514",
+                "reference": "257a9b7b47677ffbaee3578d05035ec8ca06f514",
                 "shasum": ""
             },
             "require": {
@@ -374,9 +374,9 @@
             "description": "Terrazza Component Http-Routing",
             "support": {
                 "issues": "https://github.com/terrazza/http-routing/issues",
-                "source": "https://github.com/terrazza/http-routing/tree/v1.0.0"
+                "source": "https://github.com/terrazza/http-routing/tree/v1.0.1"
             },
-            "time": "2022-05-17T20:13:55+00:00"
+            "time": "2022-05-19T15:08:04+00:00"
         },
         {
             "name": "terrazza/routing",
@@ -425,16 +425,16 @@
         },
         {
             "name": "terrazza/validator",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/terrazza/validator.git",
-                "reference": "9b69397307d4048eb00c6da5def0d2a82f50a7fb"
+                "reference": "614c109d46390116b81edabef1b1dd3aca8e97b9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/terrazza/validator/zipball/9b69397307d4048eb00c6da5def0d2a82f50a7fb",
-                "reference": "9b69397307d4048eb00c6da5def0d2a82f50a7fb",
+                "url": "https://api.github.com/repos/terrazza/validator/zipball/614c109d46390116b81edabef1b1dd3aca8e97b9",
+                "reference": "614c109d46390116b81edabef1b1dd3aca8e97b9",
                 "shasum": ""
             },
             "require": {
@@ -467,9 +467,9 @@
             "description": "Terrazza Component Validator",
             "support": {
                 "issues": "https://github.com/terrazza/validator/issues",
-                "source": "https://github.com/terrazza/validator/tree/v1.0.0"
+                "source": "https://github.com/terrazza/validator/tree/v1.0.1"
             },
-            "time": "2022-05-17T20:02:39+00:00"
+            "time": "2022-05-19T16:48:39+00:00"
         }
     ],
     "packages-dev": [
@@ -4114,12 +4114,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/vimeo/psalm.git",
-                "reference": "894e4e4c0208b4cd6626edf8e77456edc18c7779"
+                "reference": "5c1d95b3355a209a2c28391604adfde9720a1b18"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vimeo/psalm/zipball/894e4e4c0208b4cd6626edf8e77456edc18c7779",
-                "reference": "894e4e4c0208b4cd6626edf8e77456edc18c7779",
+                "url": "https://api.github.com/repos/vimeo/psalm/zipball/5c1d95b3355a209a2c28391604adfde9720a1b18",
+                "reference": "5c1d95b3355a209a2c28391604adfde9720a1b18",
                 "shasum": ""
             },
             "require": {
@@ -4214,7 +4214,7 @@
                 "issues": "https://github.com/vimeo/psalm/issues",
                 "source": "https://github.com/vimeo/psalm/tree/4.x"
             },
-            "time": "2022-05-17T18:54:58+00:00"
+            "time": "2022-05-18T17:36:55+00:00"
         },
         {
             "name": "webmozart/assert",

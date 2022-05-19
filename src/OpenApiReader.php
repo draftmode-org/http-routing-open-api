@@ -7,16 +7,25 @@ use RuntimeException;
 
 class OpenApiReader implements OpenApiReaderInterface {
     private LoggerInterface $logger;
+    private ?string $yamlFileName                   = null;
     private ?array $content                         = null;
     private ?string $contentHash                    = null;
     private array $pathParameters                   = [];
-    CONST multipleTypes = ["oneOf"];
+    CONST multipleTypes                             = ["oneOf"];
 
     public function __construct(LoggerInterface $logger, ?string $yamlFileName=null) {
         $this->logger                               = $logger;
-        if ($yamlFileName) {
-            $this->load($yamlFileName);
+        $this->yamlFileName                         = $yamlFileName;
+    }
+
+    /**
+     * @return array
+     */
+    private function getContent() : array {
+        if (is_null($this->content) && $this->yamlFileName) {
+            $this->load($this->yamlFileName);
         }
+        return $this->content ?? [];
     }
 
     /**
@@ -48,7 +57,7 @@ class OpenApiReader implements OpenApiReaderInterface {
      */
     public function getRoutes() : array {
         $skipMethods                                = ["parameters"];
-        $yaml                                       = $this->content ?? [];
+        $yaml                                       = $this->getContent();
         $paths                                      = [];
         foreach ($yaml["paths"] ?? [] as $uri => $methods) {
             foreach ($methods as $method => $properties) {
@@ -90,7 +99,7 @@ class OpenApiReader implements OpenApiReaderInterface {
                 $this->logger->debug("no params for uri $routePath, method $routeMethod and type $parametersType found");
             }
         } else {
-            $this->logger->debug("no params for uri $routePath and method $routeMethod not found");
+            $this->logger->debug("no params for uri $routePath and method $routeMethod found");
         }
         return null;
     }
@@ -124,7 +133,7 @@ class OpenApiReader implements OpenApiReaderInterface {
      */
     public function getRequestBodyContents(string $routePath, string $routeMethod) :?array {
         $this->logger->debug("getRequestBodyParams for $routePath:$routeMethod");
-        $yaml                                       = $this->content ?? [];
+        $yaml                                       = $this->getContent();
         foreach ($yaml["paths"] ?? [] as $uri => $methods) {
             if ($uri === $routePath) {
                 $this->logger->debug("...path $uri found");
@@ -173,14 +182,14 @@ class OpenApiReader implements OpenApiReaderInterface {
      * @return array|null
      */
     private function getPathParameters(string $routePath, string $routeMethod) :?array {
-        $this->logger->debug("search for params in uri $routePath and method $routeMethod");
+        $this->logger->debug("search for params for uri $routePath and method $routeMethod");
         $pathKey                                    = "$routePath:$routeMethod";
         if (array_key_exists($pathKey, $this->pathParameters)) {
             $this->logger->debug("pathKey $pathKey already initialized");
             return $this->pathParameters[$pathKey];
         }
         $this->logger->debug("initialize pathKey $pathKey");
-        $yaml                                       = $this->content ?? [];
+        $yaml                                       = $this->getContent();
         foreach ($yaml["paths"] ?? [] as $uri => $methods) {
             if ($uri === $routePath) {
                 $this->logger->debug("uri $uri found");
@@ -337,7 +346,7 @@ class OpenApiReader implements OpenApiReaderInterface {
      * @return array
      */
     private function getContentByRef(string $ref) : array {
-        $content                                = $this->content ?? [];
+        $content                                = $this->getContent();
         $refs                                   = explode("/", $ref);
         array_shift($refs);
         $nodes                                  = [];

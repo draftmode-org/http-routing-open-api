@@ -14,10 +14,14 @@ class OpenApiYamlValidator implements OpenApiYamlValidatorInterface {
         $this->logger                               = $logger;
     }
 
+    /**
+     * @param string $schemaName
+     * @param mixed|null $content
+     * @param array $properties
+     */
     public function validate(string $schemaName, $content, array $properties) : void {
-        if ($contentSchema = $this->createValidatorSchema($schemaName, $properties)) {
-            $this->validator->validate($content, $contentSchema);
-        }
+        $contentSchema                              = $this->createValidatorSchema($schemaName, $properties);
+        $this->validator->validate($content, $contentSchema);
     }
 
     /**
@@ -26,6 +30,7 @@ class OpenApiYamlValidator implements OpenApiYamlValidatorInterface {
      * @return ObjectValueSchema
      */
     private function createValidatorSchema(string $parameterName, array $properties) : ObjectValueSchema {
+        $this->logger->debug("create schema for $parameterName", $properties);
         $schema                                     = (new ObjectValueSchema($parameterName, $properties["type"]));
         $schema
             ->setRequired($properties["required"] ?? false)
@@ -45,12 +50,6 @@ class OpenApiYamlValidator implements OpenApiYamlValidatorInterface {
         if (array_key_exists("properties", $properties)) {
             $childSchema                            = [];
             foreach ($properties["properties"] as $childName => $childProperties) {
-                $childSchema[]                      = $this->createValidatorSchema($childName, $childProperties);
-            }
-            $schema->setChildSchemas(...$childSchema);
-        } elseif (array_key_exists("oneOf", $properties)) {
-            $childSchema                            = [];
-            foreach ($properties["oneOf"] as $childName => $childProperties) {
                 $childSchema[]                      = $this->createValidatorSchema($childName, $childProperties);
             }
             $schema->setChildSchemas(...$childSchema);

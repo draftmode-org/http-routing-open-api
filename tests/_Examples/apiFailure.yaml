@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Title
+  title: apiFailure.yaml
   description: Title
   version: 1.0.0
 servers:
