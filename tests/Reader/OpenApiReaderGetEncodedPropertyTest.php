@@ -137,7 +137,7 @@ class OpenApiReaderGetEncodedPropertyTest extends TestCase {
     }
 
     function testGetEncodedPropertyWithPropertiesNotArray() {
-        $reader                                     = Helper::getOpenApiReader(null, true);
+        $reader                                     = Helper::getOpenApiReader();
         $this->expectException(RuntimeException::class);
         Helper::invokeMethod($reader, "getEncodedProperty", [
             "name",

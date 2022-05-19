@@ -25,7 +25,7 @@ class OpenApiReaderGetParameterParamsTest extends TestCase {
                             [
                                 "in" => "query",
                                 "name" => "paymentFrom",
-                                "required" => true, // has to be fixed
+                                "required" => true,
                                 "schema" => [
                                     "type" => "string",
                                     "format" => "date"
@@ -49,7 +49,7 @@ class OpenApiReaderGetParameterParamsTest extends TestCase {
                     "paymentFrom" => [
                         "type" => "string",
                         "format" => "date",
-                        //"required" => true,
+                        "required" => true,
                     ]
                 ]
             ],

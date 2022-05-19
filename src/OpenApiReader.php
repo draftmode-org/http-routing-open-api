@@ -237,6 +237,9 @@ class OpenApiReader implements OpenApiReaderInterface {
                 throw new RuntimeException("node $schemaNode in parameters/$type for $name does not exist");
             }
             $schema                                 = $parameter[$schemaNode];
+            if (array_key_exists("required", $parameter)) {
+                $schema["required"]                 = $parameter["required"];
+            }
             if (!is_array($schema)) {
                 throw new RuntimeException("node parameters/$type/$name/schema expected array, given ".gettype($schema));
             }
@@ -269,6 +272,7 @@ class OpenApiReader implements OpenApiReaderInterface {
             $propertyRef                            = $property["\$ref"];
             $this->logger->debug("...getContentByRef for $propertyRef");
             $property                               = $this->getContentByRef($propertyRef);
+            $this->logger->debug("... ... found", $property);
             if (array_key_exists("required", $property)) {
                 $propertyRequired                   = $property["required"];
             }

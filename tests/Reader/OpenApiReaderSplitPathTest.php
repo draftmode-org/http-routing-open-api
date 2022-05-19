@@ -61,4 +61,25 @@ class OpenApiReaderSplitPathTest extends TestCase {
             ]
         ], $parameters);
     }
+
+    function testSplitPathParametersSchemaWithRequiredSuccessful() {
+        $reader                                     = Helper::getOpenApiReader();
+        $parameters                                 = Helper::invokeMethod($reader, "splitPathParameters", [
+            [
+                [
+                    "in"    => $type = "query",
+                    "name"  => $name = "test",
+                    "required" => true, // forward required to schema
+                    "schema" => ["type" => "string"]
+                ]
+            ], []]);
+        $this->assertEquals([
+            $type => [
+                $name => [
+                    "type" => "string",
+                    "required" => true
+                ]
+            ]
+        ], $parameters);
+    }
 }
